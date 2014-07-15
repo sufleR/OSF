@@ -19,7 +19,7 @@ var label = Titanium.UI.createLabel({
 });
 
 var button = Ti.UI.createButton({
-    title: "Scan barcode",
+    title: "Skanuj kod",
     height:50,
     width:250,
     bottom:20
@@ -41,17 +41,27 @@ button.addEventListener('click', function(){
             Ti.API.info('success callback!');
             if(data && data.barcode){
             	var stuff = db.execute("select name, address from owners where name = ? limit 1", data.barcode);
+                var man = '';
+                if(stuff.isValidRow()){
+                  man = " Pod opieką: " + stuff.fieldByName('name') + "\n Address: " + stuff.fieldByName('address')
+                } else {
+                  man = " Nie zarejestrowano takiego kodu"
+                };
                 Ti.UI.createAlertDialog({
-                    title: "Scan result",
-                    message: "BARCODE: " + data.barcode + " kolo:" + stuff.fieldByName('name') + " Address: " + stuff.fieldByName('address')
+                    title: "Wynik skanowania",
+                    message: "BARCODE: " + data.barcode + "\n" + man
                 }).show();
             }
         },
         cancel:function(){
-            Ti.API.info('TiBar cancel callback!');
+            Ti.API.info('Przerwano działanie');
         },
         error:function(){
-            Ti.API.info('TiBar error callback!');
+          Ti.API.info('success callback!');
+          Ti.UI.createAlertDialog({
+              title: "Wynik skanowania",
+              message: "Niewłaściwy rodzaj kodu kreskowego"
+          }).show();
         }
     });
 });
